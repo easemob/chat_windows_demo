@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Windows;
 using ChatSDK;
 using ChatSDK.MessageBody;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace windows_example
 {
@@ -11,8 +14,10 @@ namespace windows_example
     /// </summary>
     public partial class MainWindow : Window, IChatManagerDelegate
     {
-        private static readonly string APPKEY = "easemob-demo#easeim";
+        private static readonly string APPKEY = "41117440#383391";
+
         private readonly System.Windows.Threading.Dispatcher Dip = null;
+        private static readonly HttpClient client = new HttpClient();
 
         public MainWindow()
         {
@@ -33,26 +38,36 @@ namespace windows_example
             SDKClient.Instance.ChatManager.AddChatManagerDelegate(this);
         }
 
-        private void SignIn_Click(object sender, RoutedEventArgs e)
+        private async void SignIn_Click(object sender, RoutedEventArgs e)
         {
             if (UserIdTextBox.Text.Length == 0 || PasswordTextBox.Text.Length == 0)
             {
                 AddLogToLogText("username or password is null");
                 return;
             }
-            SDKClient.Instance.Login(username: UserIdTextBox.Text, pwdOrToken: PasswordTextBox.Text, handle: new CallBack(
-                onSuccess: () =>
-                {
-                    AddLogToLogText("sign in sdk succeed");
-                },
-                onError: (code, desc) =>
-                {
-                    AddLogToLogText($"sign in sdk failed, code: {code}, desc: {desc}");
-                }
-            ));
+
+
+            string token = await LoginToAppServer(UserIdTextBox.Text, PasswordTextBox.Text);
+            if (token != null)
+            {
+                SDKClient.Instance.LoginWithAgoraToken(UserIdTextBox.Text, token, handle: new CallBack(
+                    onSuccess: () =>
+                    {
+                        AddLogToLogText("sign in sdk succeed");
+                    },
+                    onError: (code, desc) =>
+                    {
+                        AddLogToLogText($"sign in sdk failed, code: {code}, desc: {desc}");
+                    }
+                ));
+            }
+            else
+            {
+                AddLogToLogText($"fetch token error");
+            }
         }
 
-        private void SignUp_Click(object sender, RoutedEventArgs e)
+        private async void SignUp_Click(object sender, RoutedEventArgs e)
         {
             if (UserIdTextBox.Text.Length == 0 || PasswordTextBox.Text.Length == 0)
             {
@@ -60,16 +75,16 @@ namespace windows_example
                 return;
             }
 
-            SDKClient.Instance.CreateAccount(username: UserIdTextBox.Text, PasswordTextBox.Text, handle: new CallBack(
-                onSuccess: () =>
-                {
-                    AddLogToLogText("sign up sdk succeed");
-                },
-                onError: (code, desc) =>
-                {
-                    AddLogToLogText($"sign up sdk failed, code: {code}, desc: {desc}");
-                }
-            ));
+            bool result = await RegisterToAppServer(UserIdTextBox.Text, PasswordTextBox.Text);
+            if (result)
+            {
+                AddLogToLogText("sign up succeed");
+            }
+            else
+            {
+                AddLogToLogText("sign up failed");
+            }
+
         }
 
         private void SignOut_Click(object sender, RoutedEventArgs e)
@@ -159,6 +174,58 @@ namespace windows_example
                     _ = msg.Body as FileBody;
                     AddLogToLogText($"received file message, from: {msg.From}");
                 }
+            }
+        }
+
+
+        private async Task<string> LoginToAppServer(string username, string password)
+        {
+            Dictionary<string, string> values = new Dictionary<string, string>();
+            values.Add("userAccount", username);
+            values.Add("userPassword", password);
+            string jsonStr = JsonConvert.SerializeObject(values);
+            HttpContent content = new StringContent(jsonStr);
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            HttpResponseMessage response = await client.PostAsync("https://a41.easemob.com/app/chat/user/login", content);
+            try
+            {
+                response.EnsureSuccessStatusCode();
+                var responseString = await response.Content.ReadAsStringAsync();
+                Dictionary<string, string> dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseString);
+                return dict["accessToken"];
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private async Task<Boolean> RegisterToAppServer(string username, string password)
+        {
+    
+            Dictionary<string, string> values = new Dictionary<string, string>();
+            values.Add("userAccount", username);
+            values.Add("userPassword", password);
+            string jsonStr = JsonConvert.SerializeObject(values);
+            HttpContent content = new StringContent(jsonStr);
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            HttpResponseMessage response = await client.PostAsync("https://a41.easemob.com/app/chat/user/register", content);
+            try
+            {
+                response.EnsureSuccessStatusCode();
+                var responseString = await response.Content.ReadAsStringAsync();
+                Dictionary<string, string> dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseString);
+                if (dict["code"] == "RES_OK")
+                {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 
