@@ -29,32 +29,32 @@ namespace windows_example
             AddChatDelegate();
         }
 
-        // 初始化聊天SDK
+        // Initialize chat sdk.
         private void InitSDK()
         {
 
         }
 
-        // 添加消息监听
+        // add chat delegate
         private void AddChatDelegate()
         {
 
         }
 
-        // 移除消息监听
+        // remove chat delegate
         private void RemoveChatDelegate()
         {
 
         }
 
 
-        // 关闭窗口事件
+        // close window event
         private void CloseWindow(object sender, EventArgs e)
         {
             RemoveChatDelegate();
         }
 
-        // 点击SignIn按钮
+        // sign in btn click
         private async void SignIn_Click(object sender, RoutedEventArgs e)
         {
             if (UserIdTextBox.Text.Length == 0 || PasswordTextBox.Text.Length == 0)
@@ -63,19 +63,10 @@ namespace windows_example
                 return;
             }
 
-
-            string token = await LoginToAppServer(UserIdTextBox.Text, PasswordTextBox.Text);
-            if (token != null)
-            {
-                // TODO：
-            }
-            else
-            {
-                AddLogToLogText($"fetch token error");
-            }
+            // TODO：
         }
 
-        // 点击SignUp按钮
+        // sign up btn click
         private async void SignUp_Click(object sender, RoutedEventArgs e)
         {
             if (UserIdTextBox.Text.Length == 0 || PasswordTextBox.Text.Length == 0)
@@ -83,26 +74,17 @@ namespace windows_example
                 AddLogToLogText("username or password is null");
                 return;
             }
-
-            bool result = await RegisterToAppServer(UserIdTextBox.Text, PasswordTextBox.Text);
-            if (result)
-            {
-                AddLogToLogText("sign up succeed");
-            }
-            else
-            {
-                AddLogToLogText("sign up failed");
-            }
-
+            
+            // TODO:
         }
 
-        // 点击SignOut按钮
+        // sign out btn click
         private void SignOut_Click(object sender, RoutedEventArgs e)
         {
             // TODO:
         }
 
-        // 点击Send按钮
+        // send btn click
         private void SendBtn_Click(object sender, RoutedEventArgs e)
         {
             if (SingleChatIdTextBox.Text.Length == 0)
@@ -121,7 +103,7 @@ namespace windows_example
 
         }
 
-        // 添加日志到控制台
+        // add log to log text
         private void AddLogToLogText(string log)
         {
             Dip.Invoke(() =>
@@ -131,7 +113,7 @@ namespace windows_example
             });
         }
 
-        // 根据账号密码获取登录token
+        // fetch agora token from app server by username and password.
         private async Task<string> LoginToAppServer(string username, string password)
         {
             Dictionary<string, string> values = new Dictionary<string, string>();
@@ -154,7 +136,7 @@ namespace windows_example
             }
         }
 
-        // 注册账号
+        // regist account to user server by username and password.
         private async Task<Boolean> RegisterToAppServer(string username, string password)
         {
     
