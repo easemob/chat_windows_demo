@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-using ChatSDK;
-using ChatSDK.MessageBody;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -106,7 +104,7 @@ namespace windows_example
         // add log to log text
         private void AddLogToLogText(string log)
         {
-            Dip.Invoke(() =>
+            Dip.InvokeAsync(() =>
             {
                 LogTextBox.Text += DateTime.Now + ": " + log + "\n";
                 LogTextBox.ScrollToEnd();
