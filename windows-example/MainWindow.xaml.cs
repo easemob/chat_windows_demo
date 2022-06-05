@@ -10,11 +10,11 @@ using Newtonsoft.Json;
 namespace windows_example
 {
     /// <summary>
-    /// MainWindow.xaml 的交互逻辑
+    /// MainWindow.xaml  
     /// </summary>
     public partial class MainWindow : Window
     {
-        // 初始化SDK用的Appkey，此处的值为演示用，如果正式环境需要使用你申请的Appkey
+        // Initialize the Appkey used by the SDK, the value here is for test, if the formal environment needs to use your application Appkey
         private static readonly string APPKEY = "41117440#383391";
 
         private readonly System.Windows.Threading.Dispatcher Dip = null;
