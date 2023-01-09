@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Collections.Generic;
 
 namespace windows_example
 {
@@ -45,7 +46,7 @@ namespace windows_example
         }
 
         // sign in btn click
-        private async void SignIn_Click(object sender, RoutedEventArgs e)
+        private void SignIn_Click(object sender, RoutedEventArgs e)
         {
             if (UserIdTextBox.Text.Length == 0 || PasswordTextBox.Text.Length == 0)
             {
@@ -57,7 +58,7 @@ namespace windows_example
         }
 
         // sign up btn click
-        private async void SignUp_Click(object sender, RoutedEventArgs e)
+        private void SignUp_Click(object sender, RoutedEventArgs e)
         {
             if (UserIdTextBox.Text.Length == 0 || PasswordTextBox.Text.Length == 0)
             {
